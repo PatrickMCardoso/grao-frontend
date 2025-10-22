@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api } from './api';
 
 export type Article = {
   id: number;
@@ -16,7 +16,7 @@ export async function listArticles(params: {
   search?: string;
   tag?: string;
 }) {
-  const res = await api.get("/articles", { params });
+  const res = await api.get('/articles', { params });
   return res.data as {
     total: number;
     page: number;
