@@ -1,5 +1,6 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { listArticles } from "@/services/articles";
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+
+import { listArticles } from '@/services/articles';
 
 export function useArticles(params: {
   page?: number;
@@ -8,7 +9,7 @@ export function useArticles(params: {
   tag?: string;
 }) {
   return useQuery({
-    queryKey: ["articles", params],
+    queryKey: ['articles', params],
     queryFn: () => listArticles(params),
     placeholderData: keepPreviousData,
   });

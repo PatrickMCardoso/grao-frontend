@@ -1,17 +1,15 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import { Providers } from "./providers";
+import './globals.css';
+
+import type { Metadata } from 'next';
+
+import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: "TechBlog",
-  description: "Plataforma interna de artigos.",
+  title: 'TechBlog',
+  description: 'Plataforma interna de artigos.',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
       <body className="min-h-screen bg-white text-neutral-900 antialiased">
