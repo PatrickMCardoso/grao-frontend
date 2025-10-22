@@ -3,8 +3,6 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Newsreader } from 'next/font/google';
 
-import { SiteHeader } from '@/components/site-header';
-
 import { Providers } from './providers';
 
 const newsreader = Newsreader({
@@ -23,7 +21,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className={newsreader.variable}>
       <body className="min-h-screen bg-white font-serif text-neutral-900 antialiased">
         <Providers>
-          <SiteHeader />
           <main className="container mx-auto px-4">{children}</main>
         </Providers>
       </body>
