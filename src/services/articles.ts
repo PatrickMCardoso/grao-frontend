@@ -8,6 +8,7 @@ export type Article = {
   createdAt: string;
   updatedAt: string;
   tags?: { id: number; name: string }[];
+  author?: { id: number; username: string; email: string };
 };
 
 export async function listArticles(params: {
@@ -26,6 +27,11 @@ export async function listArticles(params: {
 }
 
 export async function getArticle(id: number) {
+  const res = await api.get(`/articles/${id}`);
+  return res.data as Article;
+}
+
+export async function getArticleById(id: string | number) {
   const res = await api.get(`/articles/${id}`);
   return res.data as Article;
 }
