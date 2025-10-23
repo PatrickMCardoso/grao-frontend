@@ -135,3 +135,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.landing-title {
+  font-size: clamp(4rem, 8vw, 8rem);
+  line-height: 1.1;
+}
+
+.landing-subtitle {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+}
