@@ -19,9 +19,9 @@ export function TagScroller({ tags, active, onToggle, itemClassName }: Props) {
             type="button"
             onClick={() => onToggle(active === t ? undefined : t)}
             className={cn(
-              'bg-muted rounded-xl px-3 py-1 text-sm transition-colors',
+              'bg-muted rounded-xl px-3 py-1 text-xs transition-colors',
               active === t
-                ? 'bg-green-100 text-neutral-900'
+                ? 'bg-primary text-primary-foreground'
                 : 'text-neutral-700 hover:text-neutral-900',
               itemClassName,
             )}
