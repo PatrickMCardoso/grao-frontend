@@ -3,7 +3,15 @@
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { type AuthUser,fetchMe, signIn as apiSignIn } from '@/services/auth';
+import { type AuthUser, fetchMe, signIn as apiSignIn } from '@/services/auth';
+
+function setCookie(name: string, value: string) {
+  document.cookie = `${name}=${value}; path=/; max-age=${60 * 60 * 24 * 7}`;
+}
+
+function deleteCookie(name: string) {
+  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT`;
+}
 
 type AuthContextType = {
   user: AuthUser | null;
@@ -47,12 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { userId, user } = await apiSignIn(email, password);
         localStorage.setItem('auth.userId', String(userId));
         localStorage.setItem('auth.user', JSON.stringify(user));
+        setCookie('auth.userId', String(userId));
         setUser(user);
         router.push('/articles');
       },
       signOut: () => {
         localStorage.removeItem('auth.userId');
         localStorage.removeItem('auth.user');
+        deleteCookie('auth.userId');
         setUser(null);
         router.push('/login');
       },

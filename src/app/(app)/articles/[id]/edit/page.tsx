@@ -81,7 +81,6 @@ export default function EditArticlePage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [showAllTags, setShowAllTags] = useState(false);
 
-  // Carregar dados do artigo quando disponível
   useEffect(() => {
     if (article && article.tags) {
       const tagNames = article.tags.map((tag) => tag.name);
@@ -95,12 +94,60 @@ export default function EditArticlePage() {
     }
   }, [article]);
 
-  // Verificar se o usuário é o autor
   useEffect(() => {
     if (article && user && article.authorId !== user.id) {
       router.push('/articles');
     }
   }, [article, user, router]);
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-3">
+        <div className="space-y-2">
+          <Button variant="ghost" size="sm" asChild className="justify-start p-0">
+            <Link href="/articles" className="mt-2 gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold text-neutral-900">Carregando...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!article) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-3">
+        <div className="space-y-2">
+          <Button variant="ghost" size="sm" asChild className="justify-start p-0">
+            <Link href="/articles" className="mt-2 gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold text-neutral-900">Artigo não encontrado</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (user && article.authorId !== user.id) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-3">
+        <div className="space-y-2">
+          <Button variant="ghost" size="sm" asChild className="justify-start p-0">
+            <Link href={`/articles/${article.id}`} className="mt-2 gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar ao artigo
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold text-neutral-900">Acesso negado</h1>
+          <p className="text-neutral-600">Você só pode editar seus próprios artigos.</p>
+        </div>
+      </div>
+    );
+  }
 
   const validateForbiddenWords = (text: string): boolean => {
     const normalizedText = text
@@ -192,38 +239,6 @@ export default function EditArticlePage() {
       setErrors({ general: 'Erro ao editar artigo. Tente novamente.' });
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="mx-auto max-w-4xl space-y-3">
-        <div className="space-y-2">
-          <Button variant="ghost" size="sm" asChild className="justify-start p-0">
-            <Link href="/articles" className="mt-2 gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-bold text-neutral-900">Carregando...</h1>
-        </div>
-      </div>
-    );
-  }
-
-  if (!article) {
-    return (
-      <div className="mx-auto max-w-4xl space-y-3">
-        <div className="space-y-2">
-          <Button variant="ghost" size="sm" asChild className="justify-start p-0">
-            <Link href="/articles" className="mt-2 gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </Link>
-          </Button>
-          <h1 className="text-2xl font-bold text-neutral-900">Artigo não encontrado</h1>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-3">
