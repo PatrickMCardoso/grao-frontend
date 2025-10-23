@@ -28,7 +28,7 @@ export function SearchBar({ value, onChange, onPageReset }: Props) {
           onChange(e.target.value);
           onPageReset();
         }}
-        className="border-0 focus-visible:ring-0"
+        className="border-0 placeholder:text-neutral-400 focus-visible:ring-0"
         aria-label="Pesquisar artigos"
       />
     </div>
