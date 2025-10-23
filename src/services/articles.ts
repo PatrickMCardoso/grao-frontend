@@ -35,3 +35,17 @@ export async function getArticleById(id: string | number) {
   const res = await api.get(`/articles/${id}`);
   return res.data as Article;
 }
+
+export type UpdateArticleData = {
+  id: number;
+  title: string;
+  content: string;
+  imageUrl?: string;
+  tags: string[];
+};
+
+export async function updateArticle(data: UpdateArticleData): Promise<Article> {
+  const { id, ...updateData } = data;
+  const res = await api.put(`/articles/${id}`, updateData);
+  return res.data as Article;
+}

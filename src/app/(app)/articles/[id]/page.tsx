@@ -82,7 +82,6 @@ export default function ArticleDetailsPage() {
 
   return (
     <div className="space-y-4">
-      {/* Back button */}
       <Button variant="ghost" size="sm" asChild className="my-1 -ml-3 gap-2">
         <Link href="/articles">
           <ArrowLeft className="h-4 w-4" />
@@ -90,15 +89,12 @@ export default function ArticleDetailsPage() {
         </Link>
       </Button>
 
-      {/* Article header */}
       <ArticleHeader article={article} />
 
-      {/* Article content */}
       <div className="mt-8">
         <ArticleContent content={article.content} />
       </div>
 
-      {/* Comments section */}
       <div className="mt-10 border-t border-neutral-200 pt-8">
         <CommentsList
           comments={comments}

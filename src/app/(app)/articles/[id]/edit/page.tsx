@@ -2,15 +2,15 @@
 
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/auth';
 import { useAllTags } from '@/hooks/use-all-tags';
-
-import { useCreateArticle } from '../../../../hooks/use-create-article';
+import { useArticle } from '@/hooks/use-article';
+import { useUpdateArticle } from '@/hooks/use-update-article';
 
 type FormData = {
   title: string;
@@ -63,11 +63,13 @@ const FORBIDDEN_WORDS = [
 
 const MANUAL_TAGS = ['Frontend', 'Backend', 'Mobile', 'DevOps', 'AI'];
 
-export default function CreateArticlePage() {
+export default function EditArticlePage() {
+  const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
   const { data: allTags = [] } = useAllTags();
-  const createArticleMutation = useCreateArticle();
+  const { data: article, isLoading } = useArticle(Number(params.id));
+  const updateArticleMutation = useUpdateArticle();
 
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -78,6 +80,27 @@ export default function CreateArticlePage() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [showAllTags, setShowAllTags] = useState(false);
+
+  // Carregar dados do artigo quando disponível
+  useEffect(() => {
+    if (article && article.tags) {
+      const tagNames = article.tags.map((tag) => tag.name);
+
+      setFormData({
+        title: article.title,
+        imageUrl: '',
+        tags: tagNames,
+        content: article.content,
+      });
+    }
+  }, [article]);
+
+  // Verificar se o usuário é o autor
+  useEffect(() => {
+    if (article && user && article.authorId !== user.id) {
+      router.push('/articles');
+    }
+  }, [article, user, router]);
 
   const validateForbiddenWords = (text: string): boolean => {
     const normalizedText = text
@@ -125,17 +148,28 @@ export default function CreateArticlePage() {
   };
 
   const handleTagToggle = (tag: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: prev.tags.includes(tag) ? prev.tags.filter((t) => t !== tag) : [...prev.tags, tag],
-    }));
+    setFormData((prev) => {
+      const isSelected = prev.tags.some((t) => t.toLowerCase() === tag.toLowerCase());
+
+      if (isSelected) {
+        return {
+          ...prev,
+          tags: prev.tags.filter((t) => t.toLowerCase() !== tag.toLowerCase()),
+        };
+      } else {
+        return {
+          ...prev,
+          tags: [...prev.tags, tag],
+        };
+      }
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!user) {
-      setErrors({ general: 'Você precisa estar logado para criar um artigo' });
+      setErrors({ general: 'Você precisa estar logado para editar um artigo' });
       return;
     }
 
@@ -144,30 +178,63 @@ export default function CreateArticlePage() {
     }
 
     try {
-      await createArticleMutation.mutateAsync({
+      await updateArticleMutation.mutateAsync({
+        id: Number(params.id),
         title: formData.title.trim(),
         content: formData.content.trim(),
         imageUrl: formData.imageUrl.trim() || undefined,
         tags: formData.tags,
       });
 
-      router.push('/articles');
+      router.push(`/articles/${params.id}`);
     } catch (error) {
-      console.error('Erro ao criar artigo:', error);
-      setErrors({ general: 'Erro ao criar artigo. Tente novamente.' });
+      console.error('Erro ao editar artigo:', error);
+      setErrors({ general: 'Erro ao editar artigo. Tente novamente.' });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-3">
+        <div className="space-y-2">
+          <Button variant="ghost" size="sm" asChild className="justify-start p-0">
+            <Link href="/articles" className="mt-2 gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold text-neutral-900">Carregando...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (!article) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-3">
+        <div className="space-y-2">
+          <Button variant="ghost" size="sm" asChild className="justify-start p-0">
+            <Link href="/articles" className="mt-2 gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold text-neutral-900">Artigo não encontrado</h1>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-3">
       <div className="space-y-2">
         <Button variant="ghost" size="sm" asChild className="justify-start p-0">
-          <Link href="/articles" className="mt-2 gap-2">
+          <Link href={`/articles/${params.id}`} className="mt-2 gap-2">
             <ArrowLeft className="h-4 w-4" />
             Voltar
           </Link>
         </Button>
-        <h1 className="text-2xl font-bold text-neutral-900">Novo artigo</h1>
+        <h1 className="text-2xl font-bold text-neutral-900">Editar artigo</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -209,7 +276,7 @@ export default function CreateArticlePage() {
             Tags do artigo *
             {formData.tags.length > 0 && (
               <span className="ml-2 text-sm text-neutral-600">
-                ({formData.tags.length} selecionada{formData.tags.length !== 1 ? 's' : ''})
+                ({formData.tags.length} selecionada{formData.tags.length === 1 ? '' : 's'})
               </span>
             )}
           </legend>
@@ -222,7 +289,7 @@ export default function CreateArticlePage() {
                 type="button"
                 onClick={() => handleTagToggle(tag)}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                  formData.tags.includes(tag)
+                  formData.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
                 }`}
@@ -252,7 +319,7 @@ export default function CreateArticlePage() {
                   type="button"
                   onClick={() => handleTagToggle(tag)}
                   className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                    formData.tags.includes(tag)
+                    formData.tags.some((t) => t.toLowerCase() === tag.toLowerCase())
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
                   }`}
@@ -302,8 +369,8 @@ export default function CreateArticlePage() {
           </div>
         )}
 
-        <Button type="submit" disabled={createArticleMutation.isPending} className="mb-3 w-full">
-          {createArticleMutation.isPending ? 'Criando...' : 'Criar artigo'}
+        <Button type="submit" disabled={updateArticleMutation.isPending} className="mb-3 w-full">
+          {updateArticleMutation.isPending ? 'Salvando...' : 'Salvar alterações'}
         </Button>
       </form>
     </div>
