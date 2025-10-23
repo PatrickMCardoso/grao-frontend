@@ -48,6 +48,6 @@ export function formatTag(tag: string): string {
     return upperTag;
   }
 
-  // Capitalizar normalmente
+  // Capitaliza normalmente
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
 }

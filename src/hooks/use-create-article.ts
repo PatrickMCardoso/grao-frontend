@@ -33,7 +33,6 @@ export function useCreateArticle() {
       return data;
     },
     onSuccess: () => {
-      // Invalida a cache da lista de artigos para refrescar
       queryClient.invalidateQueries({ queryKey: ['articles'] });
     },
   });
